@@ -1,6 +1,23 @@
 <template>
   <div class="app-layout">
-    <aside class="sidebar">
+    <!-- Mobile Header -->
+    <header class="mobile-header" v-if="isMobile">
+      <button class="menu-btn" @click="toggleSidebar">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+      </button>
+      <h1>文件转换</h1>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div 
+      class="sidebar-overlay" 
+      v-if="isMobile && sidebarOpen"
+      @click="closeSidebar"
+    ></div>
+
+    <aside class="sidebar" :class="{ 'open': sidebarOpen, 'mobile': isMobile }">
       <div class="brand">
         <h1>文件转换</h1>
       </div>
@@ -9,7 +26,7 @@
           v-for="tab in tabs" 
           :key="tab.id"
           :class="{ active: currentTab === tab.id }"
-          @click="currentTab = tab.id"
+          @click="selectTab(tab.id)"
           class="nav-item"
         >
           {{ tab.label }}
@@ -21,7 +38,7 @@
     </aside>
 
     <main class="main-content">
-      <header class="top-bar">
+      <header class="top-bar" v-if="!isMobile">
         <h2>{{ currentTabLabel }}</h2>
       </header>
       <div class="content-scroll">
@@ -56,6 +73,8 @@ export default {
   data() {
     return {
       currentTab: 'img2pdf',
+      sidebarOpen: false,
+      isMobile: false,
       tabs: [
         { id: 'img2pdf', label: '图片转 PDF', component: 'ImageToPdf' },
         { id: 'pdf2img', label: 'PDF 转图片', component: 'PdfToImage' },
@@ -75,6 +94,33 @@ export default {
     currentTabLabel() {
       const tab = this.tabs.find(t => t.id === this.currentTab);
       return tab ? tab.label : 'File Converter';
+    }
+  },
+  mounted() {
+    this.checkMobile();
+    window.addEventListener('resize', this.checkMobile);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.checkMobile);
+  },
+  methods: {
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 768;
+      if (!this.isMobile) {
+        this.sidebarOpen = false;
+      }
+    },
+    toggleSidebar() {
+      this.sidebarOpen = !this.sidebarOpen;
+    },
+    closeSidebar() {
+      this.sidebarOpen = false;
+    },
+    selectTab(id) {
+      this.currentTab = id;
+      if (this.isMobile) {
+        this.closeSidebar();
+      }
     }
   }
 };
@@ -99,6 +145,40 @@ body {
   display: flex;
   height: 100vh;
   overflow: hidden;
+  position: relative;
+}
+
+/* Mobile Header */
+.mobile-header {
+  display: none;
+  background-color: #2c3e50;
+  color: white;
+  padding: 10px 15px;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.mobile-header h1 {
+  margin: 0;
+  font-size: 18px;
+  margin-left: 15px;
+  font-weight: 500;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Sidebar */
@@ -110,6 +190,30 @@ body {
   flex-direction: column;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
   flex-shrink: 0;
+  transition: transform 0.3s ease;
+  z-index: 1001;
+}
+
+.sidebar.mobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  transform: translateX(-100%);
+}
+
+.sidebar.mobile.open {
+  transform: translateX(0);
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }
 
 .brand {
@@ -171,7 +275,8 @@ body {
   display: flex;
   flex-direction: column;
   background-color: #f5f7fa;
-  min-width: 0; /* Prevent flex item from overflowing */
+  min-width: 0;
+  height: 100%;
 }
 
 .top-bar {
@@ -192,15 +297,47 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 30px;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Common Components Style Override if needed */
+/* Common Components Style Override */
 .tool-container {
   background: white;
   border-radius: 8px;
+  max-width: 100%;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   padding: 30px;
-  max-width: 900px; /* Limit width for better readability on large screens */
   margin: 0 auto;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .mobile-header {
+    display: flex;
+  }
+
+  .main-content {
+    padding-top: 60px; /* Space for header */
+  }
+
+  .content-scroll {
+    padding: 15px;
+  }
+  
+  .brand {
+    display: none; /* Hide sidebar brand on mobile since we have header */
+  }
+  
+  .sidebar.mobile {
+    padding-top: 0;
+  }
+  
+  .tool-container {
+    padding: 20px;
+  }
 }
 </style>

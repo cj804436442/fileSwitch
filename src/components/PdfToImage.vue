@@ -200,4 +200,24 @@ button:disabled {
   font-size: 16px;
   padding: 12px 24px;
 }
+
+@media (max-width: 768px) {
+  .upload-section {
+    padding: 20px;
+  }
+  
+  .preview-section {
+    flex-wrap: wrap;
+  }
+  
+  .image-card {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  .image-card img {
+    max-width: 100%;
+    height: auto;
+  }
+}
 </style>

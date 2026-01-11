@@ -220,4 +220,10 @@ button:disabled {
   font-size: 16px;
   padding: 12px 24px;
 }
+
+@media (max-width: 768px) {
+  .upload-section {
+    padding: 20px;
+  }
+}
 </style>

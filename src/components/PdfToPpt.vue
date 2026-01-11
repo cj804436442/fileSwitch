@@ -224,4 +224,10 @@ button:disabled {
   color: #666;
   margin-top: 10px;
 }
+
+@media (max-width: 768px) {
+  .upload-section {
+    padding: 20px;
+  }
+}
 </style>

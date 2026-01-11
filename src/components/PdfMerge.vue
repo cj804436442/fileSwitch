@@ -200,6 +200,21 @@ export default {
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .upload-section {
+    padding: 20px;
+  }
+  
+  .file-list li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .file-actions {
+    margin-top: 10px;
+    align-self: flex-end;
+  }
 }
 </style>
