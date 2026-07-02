@@ -1,5 +1,8 @@
 <template>
-  <div class="app-layout">
+  <div v-if="isGetLocationRoute" class="standalone-page">
+    <GetLoaction />
+  </div>
+  <div v-else class="app-layout">
     <!-- Mobile Header -->
     <header class="mobile-header" v-if="isMobile">
       <button class="menu-btn" @click="toggleSidebar">
@@ -58,6 +61,7 @@ import PdfToWord from './components/PdfToWord.vue';
 import PdfToPpt from './components/PdfToPpt.vue';
 import PptToPdf from './components/PptToPdf.vue';
 import PdfMerge from './components/PdfMerge.vue';
+import GetLoaction from './components/GetLoaction.vue';
 
 export default {
   name: 'App',
@@ -68,13 +72,15 @@ export default {
     PdfToWord,
     PdfToPpt,
     PptToPdf,
-    PdfMerge
+    PdfMerge,
+    GetLoaction
   },
   data() {
     return {
       currentTab: 'img2pdf',
       sidebarOpen: false,
       isMobile: false,
+      currentPath: window.location.pathname,
       tabs: [
         { id: 'img2pdf', label: '图片转 PDF', component: 'ImageToPdf' },
         { id: 'pdf2img', label: 'PDF 转图片', component: 'PdfToImage' },
@@ -82,7 +88,8 @@ export default {
         { id: 'pdf2word', label: 'PDF 转 Word', component: 'PdfToWord' },
         { id: 'pdf2ppt', label: 'PDF 转 PPT', component: 'PdfToPpt' },
         { id: 'ppt2pdf', label: 'PPT 转 PDF', component: 'PptToPdf' },
-        { id: 'pdfmerge', label: 'PDF 合并', component: 'PdfMerge' }
+        { id: 'pdfmerge', label: 'PDF 合并', component: 'PdfMerge' },
+        { id: 'getLoaction', label: '高德定位', component: 'GetLoaction' }
       ]
     };
   },
@@ -94,16 +101,24 @@ export default {
     currentTabLabel() {
       const tab = this.tabs.find(t => t.id === this.currentTab);
       return tab ? tab.label : 'File Converter';
+    },
+    isGetLocationRoute() {
+      return this.currentPath === '/getLocation';
     }
   },
   mounted() {
     this.checkMobile();
     window.addEventListener('resize', this.checkMobile);
+    window.addEventListener('popstate', this.updateCurrentPath);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.checkMobile);
+    window.removeEventListener('popstate', this.updateCurrentPath);
   },
   methods: {
+    updateCurrentPath() {
+      this.currentPath = window.location.pathname;
+    },
     checkMobile() {
       this.isMobile = window.innerWidth <= 768;
       if (!this.isMobile) {
@@ -146,6 +161,12 @@ body {
   height: 100vh;
   overflow: hidden;
   position: relative;
+}
+
+.standalone-page {
+  min-height: 100vh;
+  padding: 30px;
+  background-color: #f5f7fa;
 }
 
 /* Mobile Header */
@@ -338,6 +359,10 @@ body {
   
   .tool-container {
     padding: 20px;
+  }
+
+  .standalone-page {
+    padding: 15px;
   }
 }
 </style>
